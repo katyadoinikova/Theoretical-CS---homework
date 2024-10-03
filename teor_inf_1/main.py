@@ -1,74 +1,5 @@
-class transition:
-    def __init__(self, start_state, symbol, finish_state):
-        self.start_state = start_state
-        self.symbol = symbol
-        self.finish_state = finish_state
-
-
-class NFA:
-    def __init__(self, states_size, alphabet_size, transitions, start, finish):
-        self.states_size = states_size
-        self.alphabet = alphabet_size
-        self.transitions = transitions
-        self.start_state = start
-        self.finish_state = finish
-
-    def possible_moves(self, symbol, states):
-        ans = []
-        for state in states:
-            for transition in self.transitions:
-                if transition.start_state == state and transition.symbol == symbol:
-                    ans.append(transition.finish_state)
-        return ans
-
-    def do(self, input):
-        current_states = self.start_state
-        input_int = list(map(int, input.split()))
-        for symbol in input_int:
-            current_states = self.possible_moves(symbol, current_states)
-
-        for finish_state in self.finish_state:
-            if finish_state in current_states:
-                return True
-        return False
-
-
-class DFA:
-    def __init__(self, states_size, alphabet_size, transitions, start, finish):
-        self.states_size = states_size
-        self.alphabet = alphabet_size
-        self.transitions = transitions
-        self.start_state = start
-        self.finish_states = finish
-
-    def is_dfa(self):
-        if len(self.start_state) != 1:
-            return False
-        for transition in self.transitions:
-            start = transition.start_state
-            symbol = transition.symbol
-            ans = []
-            for transition in self.transitions:
-                if transition.start_state == start and transition.symbol == symbol:
-                    ans.append(transition.finish_state)
-            if len(ans) > 1:
-                return False
-        return True
-
-    def possible_move(self, symbol, state):
-        for transition in self.transitions:
-            if transition.start_state == int(state) and transition.symbol == symbol:
-                return transition.finish_state
-
-    def do(self, input):
-        input_int = list(map(int, input.split()))
-        current_state = self.start_state[0]
-        for symbol in input_int:
-            current_state = self.possible_move(symbol, current_state)
-        if current_state in self.finish_states:
-            return True
-        return False
-
+from task1 import transition, NFA, DFA
+from task2 import DFA_from_NFA
 
 def file_to_nfa_and_dfa(file_name):
     file = open(file_name, 'r')
@@ -101,13 +32,49 @@ def file_to_nfa_and_dfa(file_name):
     return (nfa, dfa)
 
 
+def file_output(file_name, dfa):
+    f = open(file_name, 'w')
+    f.write((str(len(dfa.states_map)) + '\n' + str(dfa.alphabet) + '\n'))
+    f.writelines([str(i) + ' ' for i in dfa.start_state])
+    f.write('\n')
+    f.writelines([str(i) + ' ' for i in dfa.finish_states])
+    f.write('\n')
+    for transition in dfa.transitions:
+        f.write(str(transition.start_state) + ' ' + str(transition.symbol) + ' ' + str(transition.finish_state) + '\n')
+
+    f.close()
+
+
 nfa1, dfa1 = file_to_nfa_and_dfa('example.txt')
 nfa2, dfa2 = file_to_nfa_and_dfa('example1.txt')
+nfa3, dfa3 = file_to_nfa_and_dfa('example2.txt')
+
 
 # Tests
 assert nfa1.do("0") == True
 assert nfa1.do("0 0") == False
 assert nfa1.do("1") == False
+assert dfa1 == -1
+
 assert dfa2 != -1
 assert dfa2.do("0") == False
 assert dfa2.do("0 0") == True
+
+assert nfa3.do("0") == True
+assert nfa3.do("0 1 1") == True
+
+
+
+dfa4 = DFA_from_NFA(nfa1)
+dfa4.nfa_to_dfa(nfa1)
+file_output('output.txt', dfa4)
+
+dfa5 = DFA_from_NFA(nfa3)
+dfa5.nfa_to_dfa(nfa3)
+file_output('output.txt', dfa5)
+
+s = ["0", "0 0", "1", "0 0 0 0", "0 0 1 1 0 0"]
+assert (all(nfa1.do(i) == dfa4.do(i) for i in s))
+
+s = ["0", "0 0", "1", "0 0 0 0", "0 0 1 1 0 0"]
+assert (all(nfa3.do(i) == dfa5.do(i) for i in s))
