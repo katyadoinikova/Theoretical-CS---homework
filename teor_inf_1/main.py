@@ -52,6 +52,7 @@ nfa3, dfa3 = file_to_nfa_and_dfa('example2.txt')
 
 # Tests
 assert nfa1.do("0") == True
+assert nfa1.do("0 0 0") == True
 assert nfa1.do("0 0") == False
 assert nfa1.do("1") == False
 assert dfa1 == -1
