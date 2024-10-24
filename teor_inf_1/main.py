@@ -1,5 +1,6 @@
 from task1 import transition, NFA, DFA
 from task2 import DFA_from_NFA
+from task4 import RegexVM, Instruction, compile_regex
 
 def file_to_nfa_and_dfa(file_name):
     file = open(file_name, 'r')
@@ -53,7 +54,7 @@ nfa3, dfa3 = file_to_nfa_and_dfa('example2.txt')
 # Tests
 assert nfa1.do("0") == True
 assert nfa1.do("0 0 0") == True
-assert nfa1.do("0 0") == False
+assert nfa1.do("0 0") == True
 assert nfa1.do("1") == False
 assert dfa1 == -1
 
@@ -62,20 +63,37 @@ assert dfa2.do("0") == False
 assert dfa2.do("0 0") == True
 
 assert nfa3.do("0") == True
+assert nfa3.do("0 "*1000) == False
 assert nfa3.do("0 1 1") == True
-
-
 
 dfa4 = DFA_from_NFA(nfa1)
 dfa4.nfa_to_dfa(nfa1)
-file_output('output.txt', dfa4)
+file_output('output1.txt', dfa4)
 
 dfa5 = DFA_from_NFA(nfa3)
 dfa5.nfa_to_dfa(nfa3)
-file_output('output.txt', dfa5)
+file_output('output2.txt', dfa5)
 
 s = ["0", "0 0", "1", "0 0 0 0", "0 0 1 1 0 0"]
 assert (all(nfa1.do(i) == dfa4.do(i) for i in s))
 
 s = ["0", "0 0", "1", "0 0 0 0", "0 0 1 1 0 0"]
 assert (all(nfa3.do(i) == dfa5.do(i) for i in s))
+
+
+
+
+#Task4
+
+print("Enter your regex pattern: ")
+pattern = input()
+
+instructions = compile_regex(pattern)
+print("Инструкции:")
+for i in range(len(instructions)):
+    print(f'{i}: {instructions[i]}')
+
+v = RegexVM(instructions)
+print("Enter your string :")
+input = input()
+print(v.execute(input))

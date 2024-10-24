@@ -10,7 +10,7 @@ class NFA:
         self.states_size = states_size
         self.alphabet = alphabet_size
         self.transitions = transitions
-        self.start_state = start
+        self.start_states = start
         self.finish_states = finish
 
     def possible_moves(self, symbol, states):
@@ -22,7 +22,7 @@ class NFA:
         return ans
 
     def do(self, input):
-        current_states = self.start_state
+        current_states = self.start_states
         input_int = list(map(int, input.split()))
         for symbol in input_int:
             current_states = self.possible_moves(symbol, current_states)

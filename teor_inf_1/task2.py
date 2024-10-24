@@ -4,7 +4,7 @@ class DFA_from_NFA:
     def __init__(self, nfa):
         self.nfa = nfa
         self.alphabet = nfa.alphabet
-        self.start_state = frozenset(nfa.start_state)
+        self.start_state = frozenset(nfa.start_states)
         self.transitions = []
         self.finish_states = set()
         self.states_map = {self.start_state: 0}
