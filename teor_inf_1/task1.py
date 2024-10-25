@@ -3,6 +3,10 @@ class transition:
         self.start_state = start_state
         self.symbol = symbol
         self.finish_state = finish_state
+    def __eq__(self, other):
+        if type(other) != type(self):
+            return False
+        return self.start_state == other.start_state and self.symbol == other.symbol and self.finish_state == other.finish_state
 
 
 class NFA:

@@ -1,18 +1,21 @@
+from turtledemo.penrose import start
+
 from task1 import transition, NFA
 
 class DFA_from_NFA:
     def __init__(self, nfa):
         self.nfa = nfa
         self.alphabet = nfa.alphabet
-        self.start_state = frozenset(nfa.start_states)
+        self.start_state_set = frozenset(nfa.start_states)
+        self.start_state = 0
         self.transitions = []
         self.finish_states = set()
-        self.states_map = {self.start_state: 0}
+        self.states_map = {self.start_state_set: 0}
         self.next_state_id = 1
 
     def nfa_to_dfa(self, nfa):
         is_state_visited = []
-        is_state_visited.append(self.start_state)
+        is_state_visited.append(self.start_state_set)
         while len(is_state_visited) != 0:
             cur_dfa_state = is_state_visited.pop()
 
@@ -29,7 +32,8 @@ class DFA_from_NFA:
                     is_state_visited.append(dfa_state)
                 new_transition = transition(self.states_map[cur_dfa_state], symbol, self.states_map[dfa_state])
                 self.transitions.append(new_transition)
-
+        for i in self.start_state_set:
+            self.start_state = i
         for dfa_state in self.states_map:
             if any(state in nfa.finish_states for state in dfa_state):
                 self.finish_states.add(self.states_map[dfa_state])

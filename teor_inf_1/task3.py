@@ -1,4 +1,6 @@
-from collections import defaultdict
+from collections import deque
+
+from Tools.scripts.findlinksto import visit
 
 from task1 import transition, NFA, DFA
 
@@ -112,13 +114,45 @@ def equivalent(dfa1, dfa2):
     if min_dfa1.alphabet != min_dfa2.alphabet:
         return False
 
+    queue = deque([(min_dfa1.start_state, min_dfa2.start_state)])
+    visited = {min_dfa1.start_state: min_dfa2.start_state}
+
+    while queue:
+        state_1, state_2 = queue.popleft()
+        if (state_1 in min_dfa1.finish_states) != (state_2 in min_dfa2.finish_states):
+            return False
+
+        for symbol in range(min_dfa1.alphabet):
+            next_state1 = -1
+            for transition_ in min_dfa1.transitions:
+                if transition_.start_state == state_1 and transition_.symbol == symbol:
+                    next_state1 = transition_.finish_state
+                    break
+            next_state2 = -1
+            for transition_ in min_dfa2.transitions:
+                if transition_.start_state == state_2 and transition_.symbol == symbol:
+                    next_state2 = transition_.finish_state
+                    break
+
+            if (next_state1 == -1 and next_state2 != -1) or (next_state1 != -1 and next_state2 == -1) :
+                return False
+
+            if next_state1 not in visited.keys():
+                visited[next_state1] = next_state2
+                queue.append((next_state1, next_state2))
+            else:
+                if visited[next_state1] != next_state2:
+                    return False
 
     return True
 
 
+
 def accepts_all(dfa):
-    reachable = set()
     min_dfa = minimize(dfa)
+    if min_dfa.states_size == 1 and 0 in min_dfa.finish_states:
+        return True
+    return False
 
 
 
