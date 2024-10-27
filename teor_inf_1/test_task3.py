@@ -32,8 +32,18 @@ class TestMinimize(unittest.TestCase):
     def test3(self):
         dfa = file_to_dfa("examples\example4.txt")
         min_dfa = minimize(dfa)
+        file_output_norm("min_out_3", min_dfa)
         dfa_ans = file_to_dfa("test_ans_for_minimize2.txt")
         self.assertEqual(equivalent(min_dfa, dfa_ans), True)
+    def test4(self):
+        dfa = file_to_dfa("examples\example5.txt")
+        min_dfa = minimize(dfa)
+        file_output_norm("min_out_4", min_dfa)
+        self.assertEqual(min_dfa.states_size, 1)
+        self.assertEqual(min_dfa.start_state, 0)
+        self.assertEqual(min_dfa.finish_states, {0})
+        self.assertEqual(min_dfa.transitions[0], transition(0, 0, 0))
+        self.assertEqual(min_dfa.transitions[1], transition(0, 1, 0))
 
 
 class TestEq(unittest.TestCase):

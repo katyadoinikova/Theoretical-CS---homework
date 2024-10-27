@@ -38,9 +38,9 @@ def minimize(dfa):
     reachable_dfa = get_reachable_dfa(dfa)
     states = []
     alphabet = []
-    for i in range(dfa.states_size):
+    for i in range(reachable_dfa.states_size):
         states.append(i)
-    for i in range(dfa.alphabet):
+    for i in range(reachable_dfa.alphabet):
         alphabet.append(i)
 
     cur_partition = [frozenset(reachable_dfa.finish_states), frozenset(set(states) - set(reachable_dfa.finish_states))]
@@ -160,8 +160,3 @@ def accepts_all(dfa):
     return False
 
 
-
-
-
-
-# Тестирование
