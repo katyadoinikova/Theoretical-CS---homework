@@ -66,7 +66,7 @@ class DFA:
 
     def do(self, input):
         input_int = list(map(int, input.split()))
-        current_state = self.start_state[0]
+        current_state = self.start_state
         for symbol in input_int:
             current_state = self.possible_move(symbol, current_state)
         if current_state in self.finish_states:

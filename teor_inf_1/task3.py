@@ -1,6 +1,4 @@
-from collections import deque
-
-from Tools.scripts.findlinksto import visit
+from collections import deque, defaultdict
 
 from task1 import transition, NFA, DFA
 
@@ -24,16 +22,16 @@ def get_reachable_dfa(dfa):
     new_transitions = []
     for transition_ in dfa.transitions:
         if transition_.start_state in reachable_states and transition_.finish_state in reachable_states:
-            new_transition = (set_for_new_states[transition_.start_state], transition_.symbol,
+            new_transition = transition(set_for_new_states[transition_.start_state], transition_.symbol,
                               set_for_new_states[transition_.finish_state])
             new_transitions.append(new_transition)
 
     new_finish = []
     for finish_state in dfa.finish_states:
         if finish_state in reachable_states:
-            new_finish.append(finish_state)
+            new_finish.append(set_for_new_states[finish_state])
 
-    return DFA(len(reachable_states), dfa.alphabet, new_transitions, dfa.start_state, new_finish)
+    return DFA(len(reachable_states), dfa.alphabet, new_transitions, set_for_new_states[dfa.start_state], new_finish)
 
 
 def minimize(dfa):
@@ -45,64 +43,71 @@ def minimize(dfa):
     for i in range(dfa.alphabet):
         alphabet.append(i)
 
-    cur_partition = [set(reachable_dfa.finish_states), set(states) - set(reachable_dfa.finish_states)]
+    cur_partition = [frozenset(reachable_dfa.finish_states), frozenset(set(states) - set(reachable_dfa.finish_states))]
 
     while True:
         new_partition = []
         for fragment in cur_partition:
-            new_fragments = {}
+            new_fragments = defaultdict(set)
             for state in fragment:
                 transition_for_state = []
                 for symbol in alphabet:
                     for transition_ in reachable_dfa.transitions:
                         if transition_.start_state == state and transition_.symbol == symbol:
-                            transition_for_state.append(transition_.finish_state)
-                if not (transition_for_state in new_fragments) or not(state in new_fragments[transition_for_state]):
-                    new_fragments[transition_for_state].add(state)
+                            for i in range(len(cur_partition)):
+                                if transition_.finish_state in cur_partition[i]:
+                                    transition_for_state.append(i)
+                new_fragments[tuple(transition_for_state)].add(state)
 
             for i in new_fragments.keys():
                 states_in_partition = []
                 for state in new_fragments[i]:
                     states_in_partition.append(state)
-                new_partition.append(states_in_partition)
+                new_partition.append(frozenset(states_in_partition))
 
         if len(new_partition) == len(cur_partition):
             break
         cur_partition = new_partition
 
-    min_states = set()
     min_transitions = {}
+    partition_to_states = {}
     min_start_state = None
     min_finish_states = set()
+    i = 0
+    for fragment in cur_partition:
+        partition_to_states[fragment] = i
+        i+=1
 
     for fragment in cur_partition:
-        new_state = frozenset(fragment)
-        min_states.add(new_state)
-
         if reachable_dfa.start_state in fragment:
-            min_start_state = new_state
+            min_start_state = partition_to_states[fragment]
         is_finish_state = False
         for state in fragment:
             if state in reachable_dfa.finish_states:
                 is_finish_state = True
                 break
         if is_finish_state:
-            min_finish_states.add(new_state)
-
+            min_finish_states.add(partition_to_states[fragment])
         for state in fragment:
             for symbol in alphabet:
                 next_state = -1
                 for transition_ in reachable_dfa.transitions:
                     if transition_.start_state == state and transition_.symbol == symbol:
-                        next_state = transition_.finish_state
-                        break
+                        for finish_fragment in cur_partition:
+                            if transition_.finish_state in finish_fragment:
+                                next_state = partition_to_states[finish_fragment]
+                                break
                 if next_state != -1:
-                    for next_fragment in fragment:
+                    for next_fragment in cur_partition:
                         if next_state in next_fragment:
-                            new_transition = transition(new_state, symbol, next_state)
-                            min_transitions[(new_state, symbol)] = new_transition
+                            new_transition = transition(partition_to_states[fragment], symbol, next_state)
+                            min_transitions[(partition_to_states[fragment], symbol)] = new_transition
 
-    return DFA(len(min_states), reachable_dfa.alphabet, min_transitions.values(), min_start_state, min_finish_states)
+    min_transitions_arr = []
+    for j in min_transitions.values():
+        min_transitions_arr.append(j)
+
+    return DFA(i, reachable_dfa.alphabet, min_transitions_arr, min_start_state, min_finish_states)
 
 
 def equivalent(dfa1, dfa2):
