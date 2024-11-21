@@ -156,6 +156,14 @@ def equivalent(dfa1, dfa2):
 def accepts_all(dfa):
     min_dfa = minimize(dfa)
     if min_dfa.states_size == 1 and 0 in min_dfa.finish_states:
+        for i in range(min_dfa.alphabet):
+            cur_ans = False
+            for cur_transition in min_dfa.transitions:
+                if cur_transition.symbol == i and cur_transition.start_state == 0:
+                    cur_ans = True
+                    break
+            if not cur_ans:
+                return False
         return True
     return False
 

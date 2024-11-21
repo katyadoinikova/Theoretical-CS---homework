@@ -81,4 +81,8 @@ class TestAcceptsAll(unittest.TestCase):
         dfa = file_to_dfa("examples\example_accept_all.txt")
         self.assertEqual(accepts_all(dfa), True)
 
+    def test3(self):
+        dfa = file_to_dfa("examples\example_accept_just_empty.txt")
+        self.assertEqual(accepts_all(dfa), False)
+
 
