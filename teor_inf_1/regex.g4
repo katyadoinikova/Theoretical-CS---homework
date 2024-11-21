@@ -10,5 +10,5 @@ quantExpression  : (symbol | parenthesizedExpression) ('*' | '+' | '?')?;
 parenthesizedExpression : '(' regex_start ')';
 symbol: CHAR;
 
-CHAR : [a-zA-Z0-9];
+CHAR : [ab];
 WS : [ \t\r\n]+ -> skip;
