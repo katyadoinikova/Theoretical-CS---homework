@@ -26,6 +26,20 @@ class TextCompileInstructions(unittest.TestCase):
         self.assertEqual(instructions[2].x, 0)
         self.assertEqual(instructions[3].operation, 'match')
 
+class NotCorrectRegex(unittest.TestCase):
+    def test_1 (self):
+        pattern = 'b+a|a|+'
+        self.assertIsNone(compile_regex(pattern))
+    def test_2 (self):
+        pattern = 'a++'
+        self.assertIsNone(compile_regex(pattern))
+    def test_3(self):
+        pattern = '+'
+        self.assertIsNone(compile_regex(pattern))
+    def test_4(self):
+        pattern = '(a'
+        self.assertIsNone(compile_regex(pattern))
+
 class TestExecute(unittest.TestCase):
     def test_1 (self):
         pattern = 'b+a|a|b'
