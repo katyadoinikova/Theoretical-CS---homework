@@ -3,6 +3,10 @@ class transition:
         self.start_state = start_state
         self.symbol = symbol
         self.finish_state = finish_state
+    def __eq__(self, other):
+        if type(other) != type(self):
+            return False
+        return self.start_state == other.start_state and self.symbol == other.symbol and self.finish_state == other.finish_state
 
 
 class NFA:
@@ -10,7 +14,7 @@ class NFA:
         self.states_size = states_size
         self.alphabet = alphabet_size
         self.transitions = transitions
-        self.start_state = start
+        self.start_states = start
         self.finish_states = finish
 
     def possible_moves(self, symbol, states):
@@ -22,7 +26,7 @@ class NFA:
         return ans
 
     def do(self, input):
-        current_states = self.start_state
+        current_states = self.start_states
         input_int = list(map(int, input.split()))
         for symbol in input_int:
             current_states = self.possible_moves(symbol, current_states)
@@ -62,7 +66,7 @@ class DFA:
 
     def do(self, input):
         input_int = list(map(int, input.split()))
-        current_state = self.start_state[0]
+        current_state = self.start_state
         for symbol in input_int:
             current_state = self.possible_move(symbol, current_state)
         if current_state in self.finish_states:
